@@ -14,11 +14,16 @@ jobs:
   build:
     runs-on: windows-latest
     steps:
-      - name: Check out code
-        uses: actions/checkout@v2
-      - name: Install Flutter
-        uses: subosito/flutter-action@v2
+      - name: Checkout
+        uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
         with:
-          flutter-version: stable
+          channel: 'stable'
+          flutter-version: '3.27.1'
       - name: Build Windows
         run: flutter build windows
+      - name: Archive Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: build
+          path: build/windows
