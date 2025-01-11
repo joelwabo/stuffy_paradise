@@ -5,8 +5,11 @@ import 'screens/home_screen.dart';
 import 'screens/login_screen.dart';
 import 'package:provider/provider.dart';
 import 'provider/user_session_provider.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 void main() async {
+  // Initialize the FFI database factory
+  databaseFactory = databaseFactoryFfi;
   WidgetsFlutterBinding.ensureInitialized();
   configureDependencies();
   final SqlDatabaseService _dbService = getIt();
