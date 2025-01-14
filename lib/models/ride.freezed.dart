@@ -28,7 +28,7 @@ mixin _$Ride {
   DateTime? get startTime => throw _privateConstructorUsedError;
   DateTime? get endTime => throw _privateConstructorUsedError;
   int get duration => throw _privateConstructorUsedError;
-  int get cost => throw _privateConstructorUsedError;
+  double get cost => throw _privateConstructorUsedError;
 
   /// Serializes this Ride to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -53,7 +53,7 @@ abstract class $RideCopyWith<$Res> {
       DateTime? startTime,
       DateTime? endTime,
       int duration,
-      int cost});
+      double cost});
 }
 
 /// @nodoc
@@ -117,7 +117,7 @@ class _$RideCopyWithImpl<$Res, $Val extends Ride>
       cost: null == cost
           ? _value.cost
           : cost // ignore: cast_nullable_to_non_nullable
-              as int,
+              as double,
     ) as $Val);
   }
 }
@@ -138,7 +138,7 @@ abstract class _$$RideImplCopyWith<$Res> implements $RideCopyWith<$Res> {
       DateTime? startTime,
       DateTime? endTime,
       int duration,
-      int cost});
+      double cost});
 }
 
 /// @nodoc
@@ -199,14 +199,14 @@ class __$$RideImplCopyWithImpl<$Res>
       cost: null == cost
           ? _value.cost
           : cost // ignore: cast_nullable_to_non_nullable
-              as int,
+              as double,
     ));
   }
 }
 
 /// @nodoc
 @JsonSerializable()
-class _$RideImpl implements _Ride {
+class _$RideImpl extends _Ride {
   const _$RideImpl(
       {this.id = -1,
       this.clientId,
@@ -216,7 +216,8 @@ class _$RideImpl implements _Ride {
       this.startTime,
       this.endTime,
       this.duration = 0,
-      this.cost = 0});
+      this.cost = 0})
+      : super._();
 
   factory _$RideImpl.fromJson(Map<String, dynamic> json) =>
       _$$RideImplFromJson(json);
@@ -243,7 +244,7 @@ class _$RideImpl implements _Ride {
   final int duration;
   @override
   @JsonKey()
-  final int cost;
+  final double cost;
 
   @override
   String toString() {
@@ -292,7 +293,7 @@ class _$RideImpl implements _Ride {
   }
 }
 
-abstract class _Ride implements Ride {
+abstract class _Ride extends Ride {
   const factory _Ride(
       {final int id,
       final int? clientId,
@@ -302,7 +303,8 @@ abstract class _Ride implements Ride {
       final DateTime? startTime,
       final DateTime? endTime,
       final int duration,
-      final int cost}) = _$RideImpl;
+      final double cost}) = _$RideImpl;
+  const _Ride._() : super._();
 
   factory _Ride.fromJson(Map<String, dynamic> json) = _$RideImpl.fromJson;
 
@@ -323,7 +325,7 @@ abstract class _Ride implements Ride {
   @override
   int get duration;
   @override
-  int get cost;
+  double get cost;
 
   /// Create a copy of Ride
   /// with the given fields replaced by the non-null parameter values.

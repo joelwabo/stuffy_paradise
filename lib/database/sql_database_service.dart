@@ -62,7 +62,7 @@ class SqlDatabaseService {
             userId INTEGER, 
             isComplete INTEGER,
             isPay INTEGER,
-            cost INTEGER,
+            cost DOUBLE,
             duration INTEGER,
             startTime TEXT,
             endTime TEXT,
@@ -134,8 +134,8 @@ class SqlDatabaseService {
         id: row['id'] as int,
         firstName: row['firstName'] as String,
         lastName: row['lastName'] as String,
-        email: row['email'] as String,
-        phone: row['phone'] as String,
+        email: row['email'] as String?,
+        phone: row['phone'] as String?,
       );
     }).toList();
   }
@@ -193,7 +193,7 @@ class SqlDatabaseService {
         stuffyId: row['stuffyId'] as int,
         isComplete: (row['isComplete'] as int) == 1,
         startTime: DateTime.parse(row['startTime'] as String),
-        cost: row['cost'] as int,
+        cost: row['cost'] as double,
         duration: row['duration'] as int,
         endTime: row['endTime'] != null ? DateTime.parse(row['endTime'] as String) : null,
       );
@@ -215,7 +215,7 @@ class SqlDatabaseService {
         stuffyId: row['stuffyId'] as int,
         isComplete: (row['isComplete'] as int) == 1,
         isPay: (row['isPay'] as int) == 1,
-        cost: row['cost'] as int,
+        cost: row['cost'] as double,
         duration: row['duration'] as int,
         startTime: DateTime.parse(row['startTime'] as String),
         endTime: row['endTime'] != null ? DateTime.parse(row['endTime'] as String) : null,

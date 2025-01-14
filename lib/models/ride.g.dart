@@ -19,7 +19,7 @@ _$RideImpl _$$RideImplFromJson(Map<String, dynamic> json) => _$RideImpl(
           ? null
           : DateTime.parse(json['endTime'] as String),
       duration: (json['duration'] as num?)?.toInt() ?? 0,
-      cost: (json['cost'] as num?)?.toInt() ?? 0,
+      cost: (json['cost'] as num?)?.toDouble() ?? 0,
     );
 
 Map<String, dynamic> _$$RideImplToJson(_$RideImpl instance) =>

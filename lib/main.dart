@@ -25,6 +25,7 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         title: 'Stuffy Paradise',
         theme: ThemeData(primarySwatch: Colors.blue),
+        debugShowCheckedModeBanner: false,
         home: Consumer<UserSessionProvider>(
           builder: (context, session, _) {
             return session.isLoggedIn ? HomeScreen() : LoginScreen();

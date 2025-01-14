@@ -84,13 +84,18 @@ class _RideWidget extends State<RideWidget>  {
             ),
             TimerWidget(
               startTimerCallback: (){
-                if(ride?.clientId == null || ride?.stuffyId == null)
+                if(ride?.clientId == null || ride?.stuffyId == null){
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text("Select a client and a Stuffy")),
+                  );
                   return;
+                }
+                ride = ride!.copyWith(isComplete: false);
                 if(ride?.id == -1)
                 {
                   _provider.createRide(ride!);
-                  setState(() {});
                 }
+                setState(() {});
               },
               stopTimerCallback: (duration) {
                 ride = ride!.copyWith(duration: duration, isComplete: true, cost: _provider.calculateCost(duration));
@@ -98,7 +103,7 @@ class _RideWidget extends State<RideWidget>  {
                 setState(() {});
               },
               resetTimerCallback:() {
-                ride = ride!.copyWith(duration: 0, isComplete: false, cost: 0);
+                ride = ride!.copyWith(isComplete: false, cost: 0);
                 _provider.updateRide(ride!);
                 setState(() {});
               },
@@ -112,7 +117,7 @@ class _RideWidget extends State<RideWidget>  {
               const SizedBox(
                 height: 50,
               ),
-              Text('Last ride : ${ride?.duration} minutes, \$${ride?.cost}'),
+              Text('${ride?.durationToString()}, total cost : ${ride?.cost}'),
               const SizedBox(
                 width: 10,
               ),

@@ -76,29 +76,26 @@ class HomeScreenProvider extends StateNotifier<HomeScreenModel> {
     ride = ride.copyWith(
       startTime: DateTime.now(),
     );
-    _dbService.createRide(ride, 1);
+    _dbService.createRide(ride, _userSessionProvider.currentUser!.id);
 
     final rides = await _dbService.getRides(isPay: false, userId: _userSessionProvider.currentUser!.id);
     state = state.copyWith(rides: rides, isLoading: false);
   }
 
-  int calculateCost(int duration) {
-    // Base cost for the first 10 minutes
-    if (duration <= 10) {
-      return 9;
+  double calculateCost(int duration) {
+    const double baseCost = 9;
+    const int baseDuration = 10 * 60; // 10min
+    if (duration <= baseDuration) {
+      return baseCost;
     }
 
-    // Cost for durations over 10 minutes
-    const double baseCost = 9.0;
-    const double perMinuteCost = 0.50;
-    const double maxCost = 38.50;
+    const double perSecondCost = 0.0098;
 
     // Calculate additional minutes after the first 10
-    final additionalMinutes = duration - 10;
-    final additionalCost = additionalMinutes * perMinuteCost;
+    final additionalMinutes = duration - baseDuration;
+    final additionalCost = additionalMinutes * perSecondCost;
 
-    // Total cost capped at $38.50
     final totalCost = baseCost + additionalCost;
-    return (totalCost > maxCost ? maxCost : totalCost).toInt();
+    return double.parse(totalCost.toStringAsFixed(2));
   }
 }

@@ -15,9 +15,17 @@ class Ride with _$Ride {
     DateTime? startTime,
     DateTime? endTime,
     @Default(0) int duration,
-    @Default(0) int cost,
+    @Default(0) double cost,
   }) = _Ride;
+
+  const Ride._();
 
   factory Ride.fromJson(Map<String, dynamic> json) =>
       _$RideFromJson(json);
+
+  String durationToString() {
+    final minutes = duration ~/ 60; // Integer division
+    final seconds = duration % 60; // Remainder
+    return "Ride duration is $minutes minutes and $seconds seconds.";
+  }
 }
