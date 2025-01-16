@@ -10,22 +10,16 @@ import '../models/stuffy.dart';
 import '../provider/home_screen_provider.dart';
 
 class RideWidget extends StatefulWidget  {
-  Ride? ride;
-  RideWidget(this.ride, {Key? key}) : super(key: key);
+  int index;
+  RideWidget(this.index, {Key? key}) : super(key: key);
 
   @override
   _RideWidget createState() => _RideWidget();
 }
 
 class _RideWidget extends State<RideWidget>  {
-  Ride? ride;
   HomeScreenProvider _provider = getIt();
   UserSessionProvider _userSessionProvider = getIt();
-
-  @override
-  void initState() {
-    ride = widget.ride;
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +33,7 @@ class _RideWidget extends State<RideWidget>  {
               width: 200,
               child: CustomDropdown<Client>.search(
                 items: _provider.clients,
-                initialItem: _provider.getClientFromId(ride?.clientId),
+                initialItem: _provider.getClientFromId(_provider.rides[widget.index].clientId),
                 hintText: 'Select a client',
                 noResultFoundBuilder: (_, __) {
                   return InkWell(
@@ -50,7 +44,7 @@ class _RideWidget extends State<RideWidget>  {
                   );
                 },
                 onChanged: (value) {
-                  ride = ride?.copyWith(clientId: value?.id);
+                  _provider.rides[widget.index] = _provider.rides[widget.index].copyWith(clientId: value?.id);
                 },
               ),
             ),
@@ -62,7 +56,7 @@ class _RideWidget extends State<RideWidget>  {
               width: 200,
               child: CustomDropdown<Stuffy>.search(
                 items: _provider.stuffies,
-                initialItem: _provider.getStuffyFromId(ride?.stuffyId),
+                initialItem: _provider.getStuffyFromId(_provider.rides[widget.index].stuffyId),
                 hintText: 'Select a stuffy',
                 noResultFoundBuilder: (context, __) {
                   return _userSessionProvider.currentUser!.isAdmin
@@ -75,7 +69,7 @@ class _RideWidget extends State<RideWidget>  {
                       : SizedBox.shrink(); // No option for non-admins
                 },
                 onChanged: (value) {
-                  ride = ride?.copyWith(stuffyId: value?.id);
+                  _provider.rides[widget.index] = _provider.rides[widget.index].copyWith(stuffyId: value?.id);
                 },
               ),
             ),
@@ -83,49 +77,48 @@ class _RideWidget extends State<RideWidget>  {
               width: 10,
             ),
             TimerWidget(
-              duration: ride?.duration ?? 0,
-              startTimerCallback: (){
-                if(ride?.clientId == null || ride?.stuffyId == null){
+              index: widget.index,
+              startTimerCallback: () async {
+                if(_provider.rides[widget.index].clientId == null || _provider.rides[widget.index].stuffyId == null){
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text("Select a client and a Stuffy")),
                   );
                   return;
                 }
-                ride = ride!.copyWith(isComplete: false);
-                if(ride?.id == -1)
+                _provider.rides[widget.index] = _provider.rides[widget.index].copyWith(isComplete: false, startTime: DateTime.now());
+                if(_provider.rides[widget.index].id == -1)
                 {
-                  _provider.createRide(ride!);
+                  _provider.rides[widget.index] = _provider.rides[widget.index].copyWith(id: await _provider.createRide(_provider.rides[widget.index]));
                 }
-                //setState(() {});
               },
               stopTimerCallback: (duration) {
-                ride = ride!.copyWith(duration: duration, isComplete: true, cost: _provider.calculateCost(duration));
-                _provider.updateRide(ride!);
+                _provider.rides[widget.index] = _provider.rides[widget.index].copyWith(duration: duration, isComplete: true, cost: _provider.calculateCost(duration));
+                _provider.updateRide(_provider.rides[widget.index]);
                 setState(() {});
               },
               resetTimerCallback:() {
-                ride = ride!.copyWith(isComplete: false, cost: 0);
-                _provider.updateRide(ride!);
+                _provider.rides[widget.index] = _provider.rides[widget.index].copyWith(isComplete: false, cost: 0);
+                _provider.updateRide(_provider.rides[widget.index]);
                 setState(() {});
               },
             )
           ],
         ),
         Visibility(
-          visible: ride?.isComplete ?? false,
+          visible: _provider.rides[widget.index].isComplete ?? false,
           child:  Row(
             children: [
               const SizedBox(
                 height: 50,
               ),
-              Text('${ride?.durationToString()}, total cost : ${ride?.cost}'),
+              Text('${_provider.rides[widget.index].durationToString()}, total cost : ${_provider.rides[widget.index].cost}'),
               const SizedBox(
                 width: 10,
               ),
               ElevatedButton(
                 onPressed: (){
-                  ride = ride!.copyWith(isPay: true);
-                  _provider.updateRide(ride!);
+                  _provider.rides[widget.index] = _provider.rides[widget.index].copyWith(isPay: true);
+                  _provider.updateRide(_provider.rides[widget.index]);
                   setState(() {});
                 },
                 child: Text('Pay'),

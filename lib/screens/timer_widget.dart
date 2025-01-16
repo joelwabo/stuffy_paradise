@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 
+import '../injection.dart';
+import '../provider/home_screen_provider.dart';
+
 class TimerWidget extends StatefulWidget {
-  final int duration; // Add duration parameter
+  final int index;
   final Function() startTimerCallback;
   final Function(int duration) stopTimerCallback;
   final Function() resetTimerCallback;
 
   TimerWidget({
-    required this.duration,
+    required this.index,
     required this.startTimerCallback,
     required this.stopTimerCallback,
     required this.resetTimerCallback,
@@ -20,18 +23,17 @@ class TimerWidget extends StatefulWidget {
 
 class _TimerWidgetState extends State<TimerWidget> {
   Timer? _timer;
-  late int _seconds; // Initialize based on widget.duration
   bool _isRunning = false;
+  HomeScreenProvider _provider = getIt();
 
   @override
   void initState() {
-    super.initState();
-    _seconds = widget.duration; // Set initial value from the widget
-    if (_seconds > 0) {
+    super.initState();// Set initial value from the widget
+    if (_provider.rides[widget.index].duration > 0) {
       _isRunning = true;
       _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
         setState(() {
-          _seconds++;
+          _provider.rides[widget.index] = _provider.rides[widget.index].copyWith(duration: _provider.rides[widget.index].duration+1);
         });
       });
     }
@@ -40,7 +42,7 @@ class _TimerWidgetState extends State<TimerWidget> {
   void _startTimer() {
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       setState(() {
-        _seconds++;
+        _provider.rides[widget.index] = _provider.rides[widget.index].copyWith(duration: _provider.rides[widget.index].duration+1);
       });
     });
     widget.startTimerCallback();
@@ -48,14 +50,14 @@ class _TimerWidgetState extends State<TimerWidget> {
 
   void _stopTimer() {
     _timer?.cancel();
-    widget.stopTimerCallback(_seconds);
+    widget.stopTimerCallback(_provider.rides[widget.index].duration);
   }
 
   void _resetTimer() {
     _timer?.cancel();
     widget.resetTimerCallback();
     setState(() {
-      _seconds = 0;
+      _provider.rides[widget.index] = _provider.rides[widget.index].copyWith(duration: 0);
       _isRunning = false;
     });
   }
@@ -85,11 +87,12 @@ class _TimerWidgetState extends State<TimerWidget> {
 
   @override
   Widget build(BuildContext context) {
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(
-          _formatTime(_seconds),
+          _formatTime(_provider.rides[widget.index].duration),
           style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
         ),
         const SizedBox(width: 20),
@@ -97,7 +100,7 @@ class _TimerWidgetState extends State<TimerWidget> {
           onPressed: _toggleTimer,
           child: Text(_isRunning ? 'Stop' : 'Start'),
         ),
-        if (!_isRunning && _seconds > 0) // Show Reset button if stopped
+        if (!_isRunning && _provider.rides[widget.index].duration > 0) // Show Reset button if stopped
           Padding(
             padding: const EdgeInsets.only(left: 10),
             child: ElevatedButton(

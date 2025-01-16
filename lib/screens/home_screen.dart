@@ -23,7 +23,9 @@ class _HomeScreen extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
 
-    return Scaffold(
+    return ChangeNotifierProvider(
+        create: (_) => getIt<HomeScreenProvider>(),
+        child: Scaffold(
       appBar: AppBar(
         title: const Text('Welcome to Stuffy - Paradise'),
         actions: [
@@ -63,19 +65,18 @@ class _HomeScreen extends State<HomeScreen> {
         child: Column(
           children: [
             Expanded(
-              child: StateNotifierBuilder(
-                stateNotifier: _provider,
-                builder: (context, model, _) {
-                  if (model.isLoading) {
+              child: Consumer<HomeScreenProvider>(
+                builder: (context, provider, _) {
+                  if (provider.isLoading) {
                     return const Center(
                       child: CircularProgressIndicator(),
                     );
                   }
                   return ListView.builder(
                     padding: const EdgeInsets.symmetric(vertical: 50),
-                    itemCount: model.rides.length,
+                    itemCount: provider.rides.length,
                     itemBuilder: (BuildContext context, int index) {
-                      return RideWidget(model.rides[index]);
+                      return RideWidget(index);
                     },
                   );
                 },
@@ -94,7 +95,7 @@ class _HomeScreen extends State<HomeScreen> {
           ],
         ),
       ),
-    );
+    ));
   }
 }
 

@@ -141,8 +141,8 @@ class SqlDatabaseService {
   }
 
   // Create a new Ride
-  Future<void> createRide(Ride ride, int userId) async {
-    await _db.insert(
+  Future<int> createRide(Ride ride, int userId) async {
+    final id = await _db.insert(
       'ride',
       {
         'clientId': ride.clientId,
@@ -157,7 +157,9 @@ class SqlDatabaseService {
       },
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
+    return id; // Return the ID of the created ride
   }
+
 
   // Update a Ride
   Future<void> updateRide(Ride ride) async {

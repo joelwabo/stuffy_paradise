@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:injectable/injectable.dart';
 import 'package:state_notifier/state_notifier.dart';
@@ -11,71 +12,75 @@ import '../models/ride.dart';
 import '../models/stuffy.dart';
 
 @lazySingleton
-class HomeScreenProvider extends StateNotifier<HomeScreenModel> {
+class HomeScreenProvider extends ChangeNotifier {
   final SqlDatabaseService _dbService = getIt();
   final UserSessionProvider _userSessionProvider = getIt();
 
-  get clients => state.clients;
-  get stuffies => state.stuffies;
+  List<Ride> rides = [];
+  List<Client> clients = [];
+  List<Stuffy> stuffies = [];
+  bool isLoading = false;
 
-  HomeScreenProvider() : super((HomeScreenModel())){
+  HomeScreenProvider(){
     init();
   }
 
   init() async {
-    state = state.copyWith(isLoading: true);
-    final clients = await _dbService.getClients();
-    final rides = await _dbService.getRides(isPay: false, userId: _userSessionProvider.currentUser!.id);
-    final stuffies = await _dbService.getStuffies();
+    isLoading = true;
+    notifyListeners();
 
-    state = state.copyWith(
-      clients: clients,
-      rides: rides,
-      stuffies: stuffies,
-    );
-    state = state.copyWith(isLoading: false);
+    clients = await _dbService.getClients();
+    rides = await _dbService.getRides(isPay: false, userId: _userSessionProvider.currentUser!.id);
+    stuffies = await _dbService.getStuffies();
+
+    isLoading = false;
+    notifyListeners();
   }
 
   void addClient(Client client) async {
-    state = state.copyWith(clients: [...state.clients, client]);
+    clients.add(client);
+    notifyListeners();
     await _dbService.createClient(client);
   }
 
   void createStuffy(Stuffy stuffy) async {
-    state = state.copyWith(stuffies: [...state.stuffies, stuffy]);
+    stuffies.add(stuffy);
+    notifyListeners();
     await _dbService.createStuffy(stuffy);
   }
 
   void addRide() async {
-    state = state.copyWith(rides: [...state.rides, const Ride()]);
+    rides.add(const Ride());
+    notifyListeners();
   }
 
   void updateRide(Ride ride) async {
+    final index = rides.indexWhere((r) => r.id == ride.id);
+    if (index != -1) {
+      rides[index] = ride;
+      if(ride.isPay) {
+        rides.removeAt(index);
+      }
+      notifyListeners();
+    }
     await _dbService.updateRide(ride);
-    final rides = await _dbService.getRides(isPay: false, userId: _userSessionProvider.currentUser!.id);
-    state = state.copyWith(rides: rides, isLoading: false);
+    //rides = await _dbService.getRides(isPay: false, userId: _userSessionProvider.currentUser!.id);
   }
 
   Client? getClientFromId(int? id) {
     if(id == null)
       return null;
-    return state.clients.firstWhere((client) => client.id == id);
+    return clients.firstWhere((client) => client.id == id);
   }
 
   Stuffy? getStuffyFromId(int? id) {
     if(id == null)
       return null;
-    return state.stuffies.firstWhere((stuffy) => stuffy.id == id);
+    return stuffies.firstWhere((stuffy) => stuffy.id == id);
   }
 
-  void createRide(Ride ride) async {
-    state = state.copyWith(isLoading: true);
-    ride = ride.copyWith(
-      startTime: DateTime.now(),
-    );
-    await _dbService.createRide(ride, _userSessionProvider.currentUser!.id);
-    final rides = await _dbService.getRides(isPay: false, userId: _userSessionProvider.currentUser!.id);
-    state = state.copyWith(rides: rides, isLoading: false);
+  Future<int> createRide(Ride ride) async {
+    return await _dbService.createRide(ride, _userSessionProvider.currentUser!.id);
   }
 
   double calculateCost(int duration) {
