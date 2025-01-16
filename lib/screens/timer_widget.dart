@@ -87,7 +87,14 @@ class _TimerWidgetState extends State<TimerWidget> {
 
   @override
   Widget build(BuildContext context) {
-
+    if (_provider.rides[widget.index].duration > 0 && _isRunning == false && !_provider.rides[widget.index].isComplete) {
+      _isRunning = true;
+      _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+        setState(() {
+          _provider.rides[widget.index] = _provider.rides[widget.index].copyWith(duration: _provider.rides[widget.index].duration+1);
+        });
+      });
+    }
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
