@@ -83,6 +83,7 @@ class _RideWidget extends State<RideWidget>  {
               width: 10,
             ),
             TimerWidget(
+              duration: ride?.duration ?? 0,
               startTimerCallback: (){
                 if(ride?.clientId == null || ride?.stuffyId == null){
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -95,7 +96,7 @@ class _RideWidget extends State<RideWidget>  {
                 {
                   _provider.createRide(ride!);
                 }
-                setState(() {});
+                //setState(() {});
               },
               stopTimerCallback: (duration) {
                 ride = ride!.copyWith(duration: duration, isComplete: true, cost: _provider.calculateCost(duration));

@@ -51,12 +51,9 @@ class HomeScreenProvider extends StateNotifier<HomeScreenModel> {
   }
 
   void updateRide(Ride ride) async {
-    _dbService.updateRide(ride);
-    if (ride.isPay) {
-      state = state.copyWith(
-        rides: state.rides.where((r) => r.id != ride.id).toList(),
-      );
-    }
+    await _dbService.updateRide(ride);
+    final rides = await _dbService.getRides(isPay: false, userId: _userSessionProvider.currentUser!.id);
+    state = state.copyWith(rides: rides, isLoading: false);
   }
 
   Client? getClientFromId(int? id) {
@@ -76,8 +73,7 @@ class HomeScreenProvider extends StateNotifier<HomeScreenModel> {
     ride = ride.copyWith(
       startTime: DateTime.now(),
     );
-    _dbService.createRide(ride, _userSessionProvider.currentUser!.id);
-
+    await _dbService.createRide(ride, _userSessionProvider.currentUser!.id);
     final rides = await _dbService.getRides(isPay: false, userId: _userSessionProvider.currentUser!.id);
     state = state.copyWith(rides: rides, isLoading: false);
   }

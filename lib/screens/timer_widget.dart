@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 
-import '../injection.dart';
-
 class TimerWidget extends StatefulWidget {
-  Function() startTimerCallback;
-  Function(int duration) stopTimerCallback;
-  Function() resetTimerCallback;
+  final int duration; // Add duration parameter
+  final Function() startTimerCallback;
+  final Function(int duration) stopTimerCallback;
+  final Function() resetTimerCallback;
+
   TimerWidget({
+    required this.duration,
     required this.startTimerCallback,
     required this.stopTimerCallback,
-    required this.resetTimerCallback});
+    required this.resetTimerCallback,
+  });
 
   @override
   _TimerWidgetState createState() => _TimerWidgetState();
@@ -18,8 +20,22 @@ class TimerWidget extends StatefulWidget {
 
 class _TimerWidgetState extends State<TimerWidget> {
   Timer? _timer;
-  int _seconds = 0;
+  late int _seconds; // Initialize based on widget.duration
   bool _isRunning = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _seconds = widget.duration; // Set initial value from the widget
+    if (_seconds > 0) {
+      _isRunning = true;
+      _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+        setState(() {
+          _seconds++;
+        });
+      });
+    }
+  }
 
   void _startTimer() {
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
@@ -40,6 +56,7 @@ class _TimerWidgetState extends State<TimerWidget> {
     widget.resetTimerCallback();
     setState(() {
       _seconds = 0;
+      _isRunning = false;
     });
   }
 
