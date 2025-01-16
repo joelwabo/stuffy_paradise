@@ -8,14 +8,14 @@ import '../models/user.dart';
 class UserSessionProvider extends ChangeNotifier {
   User? _currentUser;
   DateTime? _loginTime;
-  final SqlDatabaseService _dbService = getIt();
+  final SqlDatabaseService dbService = getIt();
 
   User? get currentUser => _currentUser;
   DateTime? get loginTime => _loginTime;
   bool get isLoggedIn => _currentUser != null;
 
   Future<void> login(String username, String password) async {
-    final user = await _dbService.login(username, password);
+    final user = await dbService.login(username, password);
     _currentUser = user;
     notifyListeners();
   }

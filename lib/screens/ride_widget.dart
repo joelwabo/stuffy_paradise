@@ -93,6 +93,7 @@ class _RideWidget extends State<RideWidget>  {
               },
               stopTimerCallback: (duration) {
                 _provider.rides[widget.index] = _provider.rides[widget.index].copyWith(duration: duration, isComplete: true, cost: _provider.calculateCost(duration));
+                _provider.updateOdometer(_provider.rides[widget.index].stuffyId, duration);
                 _provider.updateRide(_provider.rides[widget.index]);
                 setState(() {});
               },

@@ -9,14 +9,14 @@ import '../models/user.dart';
 
 @lazySingleton
 class SqlDatabaseService {
-  late Database _db;
+  late Database db;
 
   Future<void> init() async {
     final directory = Directory.current.path;
     final path = join(directory, 'app_database.db');
     print(path);
 
-    _db = await openDatabase(
+    db = await openDatabase(
       path,
       version: 1,
       onCreate: (db, version) async {
@@ -78,7 +78,7 @@ class SqlDatabaseService {
 
   // Create a new Client
   Future<void> createClient(Client client) async {
-    await _db.insert(
+    await db.insert(
       'client',
       {
         'firstName': client.firstName,
@@ -93,7 +93,7 @@ class SqlDatabaseService {
 
   // Update a Client
   Future<void> updateClient(Client client) async {
-    await _db.update(
+    await db.update(
       'client',
       {
         'firstName': client.firstName,
@@ -108,7 +108,7 @@ class SqlDatabaseService {
 
   // Get a Client by ID
   Future<Client?> getClient(int id) async {
-    final result = await _db.query(
+    final result = await db.query(
       'client',
       where: 'id = ?',
       whereArgs: [id],
@@ -128,7 +128,7 @@ class SqlDatabaseService {
 
   // Get all Clients
   Future<List<Client>> getClients() async {
-    final result = await _db.query('client');
+    final result = await db.query('client');
     return result.map((row) {
       return Client(
         id: row['id'] as int,
@@ -142,7 +142,7 @@ class SqlDatabaseService {
 
   // Create a new Ride
   Future<int> createRide(Ride ride, int userId) async {
-    final id = await _db.insert(
+    final id = await db.insert(
       'ride',
       {
         'clientId': ride.clientId,
@@ -163,7 +163,7 @@ class SqlDatabaseService {
 
   // Update a Ride
   Future<void> updateRide(Ride ride) async {
-    await _db.update(
+    await db.update(
       'ride',
       {
         'clientId': ride.clientId,
@@ -182,7 +182,7 @@ class SqlDatabaseService {
 
   // Get a Ride by ID
   Future<Ride?> getRide(int id) async {
-    final result = await _db.query(
+    final result = await db.query(
       'ride',
       where: 'id = ?',
       whereArgs: [id],
@@ -205,7 +205,7 @@ class SqlDatabaseService {
 
   // Get all Rides with a startTime >= param date
   Future<List<Ride>> getRides({required bool isPay, required int userId}) async {
-    final result = await _db.query(
+    final result = await db.query(
       'ride',
       where: 'isPay = ? AND userId = ?',
       whereArgs: [isPay ? 1 : 0, userId],
@@ -227,7 +227,7 @@ class SqlDatabaseService {
 
   // Create a new Stuffy
   Future<void> createStuffy(Stuffy stuffy) async {
-    await _db.insert(
+    await db.insert(
       'stuffy',
       {
         'name': stuffy.name,
@@ -240,7 +240,7 @@ class SqlDatabaseService {
 
   // Update a Stuffy
   Future<void> updateStuffy(Stuffy stuffy) async {
-    await _db.update(
+    await db.update(
       'stuffy',
       {
         'name': stuffy.name,
@@ -253,7 +253,7 @@ class SqlDatabaseService {
 
   // Get a Stuffy by ID
   Future<Stuffy?> getStuffy(int id) async {
-    final result = await _db.query(
+    final result = await db.query(
       'stuffy',
       where: 'id = ?',
       whereArgs: [id],
@@ -271,7 +271,7 @@ class SqlDatabaseService {
 
   // Get all Stuffies
   Future<List<Stuffy>> getStuffies() async {
-    final result = await _db.query('stuffy');
+    final result = await db.query('stuffy');
     return result.map((row) {
       return Stuffy(
         id: row['id'] as int,
@@ -283,7 +283,7 @@ class SqlDatabaseService {
 
   Future<void> createUser(User user) async {
     final hashedPassword = _hashPassword(user.userName); // Hash the password
-    await _db.insert(
+    await db.insert(
       'user',
       {
         'userName': user.userName,
@@ -297,7 +297,7 @@ class SqlDatabaseService {
 
   Future<User?> login(String userName, String password) async {
     final hashedPassword = _hashPassword(password);
-    final result = await _db.query(
+    final result = await db.query(
       'user',
       where: 'userName = ? AND password = ?',
       whereArgs: [userName, hashedPassword],
@@ -318,7 +318,7 @@ class SqlDatabaseService {
     if (newUserName != null) updates['userName'] = newUserName;
     if (newPassword != null) updates['password'] = _hashPassword(newPassword);
     if (updates.isNotEmpty) {
-      await _db.update(
+      await db.update(
         'user',
         updates,
         where: 'id = ?',

@@ -99,4 +99,40 @@ class HomeScreenProvider extends ChangeNotifier {
     final totalCost = baseCost + additionalCost;
     return double.parse(totalCost.toStringAsFixed(2));
   }
+
+  void updateOdometer(int? stuffyId, int duration) async {
+    if (stuffyId == null) return;
+
+    // Calculate the distance in kilometers (speed is 5 km/h)
+    const double speedKmPerHour = 5.0;
+    const double speedKmPerSecond = speedKmPerHour / 3600.0; // Convert speed to km per second
+    double distance = speedKmPerSecond * duration; // Calculate the distance covered
+
+    // Get the current odometer value for the stuffy
+    final db = await getIt<SqlDatabaseService>().db; // Assuming db is a method that provides the database instance
+
+    final result = await db.query(
+      'stuffy',
+      columns: ['odometer'],
+      where: 'id = ?',
+      whereArgs: [stuffyId],
+    );
+
+    if (result.isNotEmpty) {
+      // Get the current odometer value
+      double currentOdometer = result.first['odometer'] as double? ?? 0.0;
+
+      // Add the new distance to the existing odometer value
+      double newOdometer = currentOdometer + distance;
+
+      // Update the odometer value in the database
+      await db.update(
+        'stuffy',
+        {'odometer': newOdometer},
+        where: 'id = ?',
+        whereArgs: [stuffyId],
+      );
+    }
+  }
+
 }
