@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:stuffy_paradise/database/sql_database_service.dart';
+import 'package:stuffy_paradise/provider/home_screen_provider.dart';
 import 'injection.dart';
 import 'screens/home_screen.dart';
 import 'screens/login_screen.dart';
@@ -20,8 +21,11 @@ void main() async {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => UserSessionProvider(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => getIt<HomeScreenProvider>()),
+        ChangeNotifierProvider(create: (_) => UserSessionProvider()),
+      ],
       child: MaterialApp(
         title: 'Stuffy Paradise',
         theme: ThemeData(primarySwatch: Colors.blue),

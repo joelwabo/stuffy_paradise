@@ -23,9 +23,7 @@ class _HomeScreen extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
 
-    return ChangeNotifierProvider(
-        create: (_) => getIt<HomeScreenProvider>(),
-        child: Scaffold(
+    return Scaffold(
       appBar: AppBar(
         title: const Text('Welcome to Stuffy - Paradise'),
         actions: [
@@ -95,7 +93,7 @@ class _HomeScreen extends State<HomeScreen> {
           ],
         ),
       ),
-    ));
+    );
   }
 }
 
