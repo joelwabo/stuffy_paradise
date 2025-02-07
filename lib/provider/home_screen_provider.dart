@@ -1,13 +1,11 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
-import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:injectable/injectable.dart';
-import 'package:state_notifier/state_notifier.dart';
 import 'package:stuffy_paradise/injection.dart';
 import 'package:stuffy_paradise/provider/user_session_provider.dart';
 
 import '../database/sql_database_service.dart';
 import '../models/client.dart';
-import '../models/home_screen_model.dart';
 import '../models/ride.dart';
 import '../models/stuffy.dart';
 
@@ -70,13 +68,13 @@ class HomeScreenProvider extends ChangeNotifier {
   Client? getClientFromId(int? id) {
     if(id == null)
       return null;
-    return clients.firstWhere((client) => client.id == id);
+    return clients.firstWhereOrNull((client) => client.id == id);
   }
 
   Stuffy? getStuffyFromId(int? id) {
     if(id == null)
       return null;
-    return stuffies.firstWhere((stuffy) => stuffy.id == id);
+    return stuffies.firstWhereOrNull((stuffy) => stuffy.id == id);
   }
 
   Future<int> createRide(Ride ride) async {
